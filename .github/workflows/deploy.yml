@@ -1,0 +1,52 @@
+name: Deploy landing
+
+on:
+  push:
+    branches: [release]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: landing-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/release'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Build static site
+        run: |
+          npm ci
+          npm run build
+          printf '%s\n' "$GITHUB_SHA" > dist/deployment.txt
+      - name: Configure restricted SSH identity
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN_HOSTS: ${{ vars.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+      - name: Publish atomically
+        env:
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+        run: |
+          tar -C dist -czf - . | ssh -i ~/.ssh/deploy_key -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes "mandagram-deploy@$DEPLOY_HOST" "deploy $GITHUB_SHA"
+      - name: Verify public deployment
+        run: |
+          test "$(curl --fail --silent --show-error --retry 6 --retry-delay 10 https://mandagram.com/deployment.txt?commit=$GITHUB_SHA)" = "$GITHUB_SHA"
+      - name: Remove ephemeral key
+        if: always()
+        run: rm -f ~/.ssh/deploy_key
