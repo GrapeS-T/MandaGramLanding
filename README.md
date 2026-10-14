@@ -79,7 +79,7 @@ mandagram/
 
 ### 1. Установка зависимостей
 ```bash
-npm install
+npm ci
 ```
 
 ### 2. Запуск в режиме разработки
@@ -98,6 +98,24 @@ npm run build
 ```bash
 npm run preview
 ```
+
+### Автодеплой на mandagram.com
+
+Продакшн публикуется из ветки `release` через `.github/workflows/deploy.yml`. Каждый push собирает статический сайт на Node.js 22 с `npm ci`, передаёт архив по SSH и проверяет опубликованный SHA на `https://mandagram.com/deployment.txt`. Ручной запуск workflow также разрешён только для `release`; `main` и `dev` не деплоятся.
+
+На сервере `ssh mandagram` сайт обслуживает Caddy с автоматически обновляемым HTTPS-сертификатом. Конфигурация: `deploy/Caddyfile` → `/etc/caddy/Caddyfile`. Статика: `/srv/mandagram/releases/<SHA>`, активный сайт — атомарно переключаемая ссылка `/srv/mandagram/current`. Предыдущие версии сохраняются для ручного отката; за свободным местом в `releases` нужно следить.
+
+Actions использует отдельного пользователя `mandagram-deploy` без sudo. Его SSH-ключ ограничен командой `/usr/local/bin/mandagram-landing-deploy` (исходник `deploy/receive.sh`), без shell, PTY и перенаправления портов. Приватный ключ хранится только в секрете репозитория `DEPLOY_SSH_KEY`; переменные `DEPLOY_HOST` и `DEPLOY_KNOWN_HOSTS` задают адрес и проверенный ключ сервера. При смене сервера или SSH host key обновите эти переменные; при изменении receiver/Caddyfile установите их на сервер через административный SSH.
+
+Cloudflare проксирует `mandagram.com` на сервер; origin поддерживает HTTPS с публичным сертификатом, поэтому совместим с режимом Full (strict). Cloudflare API-токен для деплоя не нужен. `/deployment.txt` отдаётся с `Cache-Control: no-store`, файлы `/_a/` — с immutable-кешем.
+
+Публикация принятого состояния:
+```bash
+git switch release
+git merge --ff-only origin/main
+git push origin release
+```
+Если fast-forward невозможен, сначала выясните расхождение; не используйте force push. Не коммитьте ключи и серверные секреты.
 
 ---
 
