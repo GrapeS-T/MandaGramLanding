@@ -132,9 +132,7 @@ const pageTitle = isDoc ? `${title} — MandaGram Desktop` : `${title} — До�
   <!-- Мобильные шторки (Bottom Sheets) -->
   {!isDoc && (
     <>
-      <div class="sheet-scrim" id="sheet-scrim" hidden="" data-sheet-scrim=""></div>
-      
-      <div class="sheet" id="kb-sheet" role="dialog" aria-modal="true" aria-label="Разделы документации" hidden="" data-sheet="">
+      <dialog class="sheet" id="kb-sheet" aria-label="Разделы документации" data-sheet="">
         <div class="sheet-drag" aria-hidden="true"><span></span></div>
         <div class="sheet-head">
           <h2>Разделы</h2>
@@ -145,9 +143,9 @@ const pageTitle = isDoc ? `${title} — MandaGram Desktop` : `${title} — До�
         <div class="sheet-body">
           <KbSidebar currentSlug={currentSlug} isSheet={true} />
         </div>
-      </div>
+      </dialog>
 
-      <div class="sheet" id="toc-sheet" role="dialog" aria-modal="true" aria-label="Содержание статьи" hidden="" data-sheet="">
+      <dialog class="sheet" id="toc-sheet" aria-label="Содержание статьи" data-sheet="">
         <div class="sheet-drag" aria-hidden="true"><span></span></div>
         <div class="sheet-head">
           <h2>Содержание</h2>
@@ -158,7 +156,7 @@ const pageTitle = isDoc ? `${title} — MandaGram Desktop` : `${title} — До�
         <div class="sheet-body">
           <KbToc headings={headings} isSheet={true} />
         </div>
-      </div>
+      </dialog>
     </>
   )}
 
@@ -237,28 +235,22 @@ const pageTitle = isDoc ? `${title} — MandaGram Desktop` : `${title} — До�
         }
       }
 
-      // Bottom sheets
+      // Native dialogs provide focus containment, Escape and focus restoration.
       document.querySelectorAll("[data-sheet-open]").forEach(btn => {
         btn.addEventListener("click", () => {
-          const sheet = document.getElementById(btn.dataset.sheetOpen);
-          const scrim = document.getElementById("sheet-scrim");
-          if (sheet) sheet.removeAttribute("hidden");
-          if (scrim) scrim.removeAttribute("hidden");
+          document.getElementById(btn.dataset.sheetOpen)?.showModal();
         });
       });
-
-      const closeSheets = () => {
-        document.querySelectorAll("[data-sheet]").forEach(s => s.setAttribute("hidden", ""));
-        const scrim = document.getElementById("sheet-scrim");
-        if (scrim) scrim.setAttribute("hidden", "");
-      };
-
-      document.querySelectorAll("[data-sheet-close]").forEach(btn => {
-        btn.addEventListener("click", closeSheets);
+      document.querySelectorAll("[data-sheet]").forEach(sheet => {
+        sheet.querySelector("[data-sheet-close]")?.addEventListener("click", () => sheet.close());
+        sheet.addEventListener("click", event => {
+          if (event.target.closest("a")) sheet.close();
+          if (event.target === sheet) {
+            const bounds = sheet.getBoundingClientRect();
+            if (event.clientY < bounds.top || event.clientX < bounds.left || event.clientX > bounds.right) sheet.close();
+          }
+        });
       });
-
-      const scrim = document.getElementById("sheet-scrim");
-      if (scrim) scrim.addEventListener("click", closeSheets);
     });
   </script>
 </Base>
