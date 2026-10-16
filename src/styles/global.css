@@ -354,10 +354,6 @@ a,button {
   transform:scale(.95);
 }
 
-.tcard.is-pressed {
-  border-radius:32px;
-  transform:scale(.97);
-}
 
 .vrow.is-pressed {
   transform:scale(.98);
@@ -1529,7 +1525,8 @@ html.rv .reveal.is-shown {
   -webkit-user-drag: none;
   background: var(--tc-bg, #1D1513);
   min-width: 0;
-  transition: border-radius var(--d) var(--spring), transform var(--d) var(--spring), border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transform-origin: center;
   flex: 1;
   padding: 22px;
   display: flex;
@@ -1553,10 +1550,6 @@ html.rv .reveal.is-shown {
 }
 
 @media (hover:hover) {
-  .tcar:not(.is-drag) .tcard:hover {
-    border-radius: 40px;
-  }
-
   .tcar:not(.is-drag) .tcard:hover .tc-go {
     transform: translate(2px,-2px);
   }
