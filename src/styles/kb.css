@@ -7,7 +7,7 @@
   --tone-warning:#f3c56f;
   --tone-danger:#ffb4ab;
   --side:216px;
-  --toc:200px;
+  --toc:216px;
 }
 
 :root[data-theme=light] {
@@ -418,14 +418,14 @@
 
 .kba.wrap {
   grid-template-columns: var(--side) minmax(0, 880px) var(--toc);
-  justify-content: start;
+  justify-content: center;
   padding-top: calc(var(--header-h) + 40px);
   align-items: start;
   gap: 24px;
   padding-bottom: 96px;
   display: grid;
   width: 100%;
-  max-width: 1520px;
+  max-width: calc(var(--side) + 880px + var(--toc) + 80px);
   padding-inline: 16px;
   margin-inline: auto;
 }
