@@ -1491,7 +1491,8 @@ html.rv .reveal.is-shown {
 
 .tcar {
   --tw:296px;
-  --tgap:8px;
+  --tgap:16px;
+  --edge-fade:clamp(24px, 5vw, 72px);
   touch-action:pan-y;
   cursor:grab;
   -webkit-user-select:none;
@@ -1499,6 +1500,9 @@ html.rv .reveal.is-shown {
   width:100%;
   position:relative;
   overflow:clip visible;
+  padding-block:24px;
+  margin-block:-24px;
+  mask-image:linear-gradient(to right, transparent, #000 var(--edge-fade), #000 calc(100% - var(--edge-fade)), transparent);
 }
 
 .tcar.is-drag {
@@ -1526,7 +1530,6 @@ html.rv .reveal.is-shown {
   background: var(--tc-bg, #1D1513);
   min-width: 0;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  transform-origin: center;
   flex: 1;
   padding: 22px;
   display: flex;
