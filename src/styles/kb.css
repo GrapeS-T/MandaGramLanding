@@ -6,7 +6,7 @@
   --tone-important:var(--tertiary);
   --tone-warning:#f3c56f;
   --tone-danger:#ffb4ab;
-  --side:248px;
+  --side:216px;
   --toc:200px;
 }
 
@@ -418,15 +418,15 @@
 
 .kba.wrap {
   grid-template-columns: var(--side) minmax(0, 880px) var(--toc);
-  justify-content: center;
+  justify-content: start;
   padding-top: calc(var(--header-h) + 40px);
   align-items: start;
-  gap: 32px;
+  gap: 24px;
   padding-bottom: 96px;
   display: grid;
   width: 100%;
   max-width: 1520px;
-  padding-inline: clamp(16px, 2.5vw, 40px);
+  padding-inline: 16px;
   margin-inline: auto;
 }
 
@@ -457,7 +457,7 @@
 .knav-groups {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
 }
 
 .knav {
@@ -500,8 +500,8 @@
   letter-spacing:-.01em;
   transition:background-color var(--d-fast) var(--ease), color var(--d-fast) var(--ease), border-radius var(--d) var(--spring);
   border-radius:14px;
-  padding:8px 12px;
-  font-size:14px;
+  padding:6px 10px;
+  font-size:13px;
   font-weight:500;
   display:block;
 }
@@ -1149,12 +1149,7 @@ html:has(.sheet[open]) {
   overflow:hidden;
 }
 
-@media (width<=1399px) {
-  .kba.wrap {
-    grid-template-columns:var(--side) minmax(0, 880px);
-    gap:32px;
-  }
-
+@media (width<=1099px) {
   .kba-toc {
     display:none;
   }
@@ -1180,11 +1175,14 @@ html:has(.sheet[open]) {
     border-radius:12px;
   }
 
+
+}
+
+@media (width<=1399px) {
   .kbi-groups {
     grid-template-columns:repeat(2,minmax(0,1fr));
     gap:16px;
   }
-
 }
 
 @media (width<=1099px) {
@@ -1391,7 +1389,7 @@ html:has(.sheet[open]) {
   color:var(--text);
 }
 
-@media (width<=1399px) {
+@media (width<=1099px) {
   .kba.kba--doc {
     max-width:calc(760px + 2 * var(--pad));
     grid-template-columns:minmax(0,1fr);
