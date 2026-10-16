@@ -2,7 +2,7 @@
 import Base from "../layouts/Base.astro";
 import { featuresRu } from "../data/features";
 import { teamRu } from "../data/team";
-import { kbPopularQuickLinks } from "../data/kb";
+import { kbPopularQuickLinks, kbArticles } from "../data/kb";
 
 const jsonLd = [
   {
@@ -40,23 +40,9 @@ const jsonLd = [
   }
 ];
 
-const kbSearchList = JSON.stringify([
-  ["intro", "Введение в MandaGram", "что такое mandagram архитектура концепция"],
-  ["installation", "Установка на Windows и Linux", "установка windows linux portable exe appimage скачать"],
-  ["hotkeys", "Горячие клавиши и шорткаты", "горячие клавиши шорткаты ctrl форматирование"],
-  ["quickstart", "Быстрый старт: первый плагин", "быстрый старт создание плагина c abi init dll so"],
-  ["api", "C API и перехват методов", "c api hookparam hook before after перехват вызовов"],
-  ["examples", "Примеры на C++, Rust, Zig и D", "примеры кода cpp rust zig d betterc исходники"],
-  ["hotreload", "Горячая перезагрузка (Hot-Reload)", "горячая перезагрузка hot reload без перезапуска кэш"],
-  ["storage", "Хранилище, настройки и Watchdog", "watchdog защита от сбоев safe mode data cache хранилище"],
-  ["architecture", "Архитектура ядра и Compose", "архитектура jni bytebuddy compose multiplatform slot api"],
-  ["themes", "Material 3 Expressive и темы Monet", "темы оформления monet evening red pistachio lavender google sans"],
-  ["privacy", "Приватность и Ghost Mode", "режим невидимки предпросмотр без галочек applock"],
-  ["media", "Встроенный медиаплеер VLC", "плеер vlc видео аудио кодеки аппаратное ускорение"],
-  ["proxy", "Умный прокси и автопинг", "прокси mtproto socks5 пинг автопереключение обход"],
-  ["troubleshooting", "Решение проблем и Safe Mode", "ошибки проблемы вылеты safe mode не загружается плагин"],
-  ["community", "Сообщество и контакты", "сообщество чат telegram github поддержка"]
-]);
+const kbSearchList = JSON.stringify(Object.values(kbArticles).map(article => [
+  article.slug, article.title, article.headings.map(heading => heading.text).join(' ')
+]));
 ---
 <Base
   title="MandaGram"
@@ -210,7 +196,7 @@ const kbSearchList = JSON.stringify([
         <div class="kb-head reveal">
           <h2 class="h2-xl" id="kb-title">База знаний и разработка</h2>
           <p class="kb-sub">
-            Подробные руководства по C ABI, хукам ByteBuddy, структуре HookParam, сборке плагинов на C++, Rust, Zig, D и тонкостям настройки клиента.
+            Руководства по C ABI и FFM, перехвату JVM-методов, структуре HookParam, сборке плагинов на C++, Rust, Zig и D, возможностям и ограничениям клиента.
           </p>
         </div>
 
