@@ -1679,9 +1679,9 @@ html.rv .reveal.is-shown {
 
 .tc-tags span {
   border-radius:var(--r-chip);
-  background:var(--tc-chip);
+  background:var(--tc-chip, var(--chip-on));
   height:32px;
-  color:var(--tc-chip-t);
+  color:var(--tc-chip-t, var(--on-chip-on));
   letter-spacing:-.02em;
   align-items:center;
   padding:0 12px;
