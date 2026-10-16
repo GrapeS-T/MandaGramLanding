@@ -30,7 +30,7 @@ export const teamRu: TeamMember[] = [
     name: "extera.cat.furry",
     role: "разработчик",
     tags: ["Разработка"],
-    tone: "",
+    tone: "tcard--qidok",
     telegram: "https://t.me/qidok",
     avatar: "/assets/team/qidok.png"
   }
@@ -58,7 +58,7 @@ export const teamEn: TeamMember[] = [
     name: "extera.cat.furry",
     role: "Developer",
     tags: ["Development"],
-    tone: "",
+    tone: "tcard--qidok",
     telegram: "https://t.me/qidok",
     avatar: "/assets/team/qidok.png"
   }
