@@ -453,6 +453,11 @@
   mask:linear-gradient(#000 calc(100% - 32px),#0000);
 }
 
+.kba-side .knav {
+  padding-top:32px;
+  mask-image:linear-gradient(to bottom, transparent, #000 32px, #000 calc(100% - 32px), transparent);
+}
+
 
 .knav-groups {
   display: flex;
