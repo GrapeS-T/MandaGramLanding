@@ -74,6 +74,8 @@ WINDOWS x64
 Run in an x64 Native Tools Command Prompt from the extracted SDK root. Ensure
 rustc reports an x86_64-pc-windows-msvc host; Rust's MSVC toolchain needs the same
 linker environment. PowerShell also works after importing the MSVC environment.
+Do not use Git Bash for the Windows MSVC build: its /usr/bin/link.exe can shadow
+the Visual Studio linker and make Rust linking fail.
   cd examples
   cl /nologo /std:c++17 /O2 /EHsc /LD /Iinclude cpp\hello.cpp /link /OUT:hello.dll
   cl /nologo /std:c++17 /O2 /EHsc /LD /Iinclude cpp\plugin.cpp /link /OUT:plain_cpp.dll

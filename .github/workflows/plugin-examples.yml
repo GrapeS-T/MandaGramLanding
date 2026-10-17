@@ -9,7 +9,7 @@ on:
       - 'package.json'
       - '.github/workflows/plugin-examples.yml'
   push:
-    branches: [release, docs/engine-and-team]
+    branches: [dev, main, release]
     paths:
       - 'public/include/**'
       - 'public/examples/**'
@@ -83,7 +83,7 @@ jobs:
           cl /nologo /std:c++17 /O2 /EHsc /LD /Iinclude recipes\chat_counter.cpp /link /OUT:chat_counter.dll
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Compile Rust cdylib
-        shell: bash
+        shell: ${{ runner.os == 'Windows' && 'pwsh' || 'bash' }}
         working-directory: ${{ runner.temp }}/plugin-sdk/examples/rust
         run: |
           rustc --version
