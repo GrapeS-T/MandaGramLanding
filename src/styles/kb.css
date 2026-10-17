@@ -1544,6 +1544,11 @@ html:has(.sheet[open]) {
   width:min(480px,100%);
 }
 
+.nf .kbs-res {
+  position:static;
+  width:100%;
+}
+
 .krow,.pg {
   transition:border-radius var(--d) var(--spring), background-color var(--d) var(--ease), transform var(--d) var(--spring);
 }
