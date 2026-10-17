@@ -1,0 +1,142 @@
+MandaGram native plugin SDK: source-matched examples, not runtime certification
+
+SOURCE IDENTITY AND EVIDENCE
+Engine revision: 259fc5a38b64a12c85121838278f78ee72541dfb
+Repository: https://github.com/GrapeS-T/MandaGram
+Read manifest.json for committed header SHA256 values and all bundled file hashes.
+Headers match the committed engine blobs. Windows checkout CRLF is normalized to
+LF before hashing and bundling; no other source changes are permitted. The header
+working tree was content-clean during the source audit; this does not attest to
+the rest of that checkout or to any distributed MandaGram binary.
+
+These are three separate evidence levels:
+1. Source-matched: the header bytes and pinned engine source agree.
+2. Compiled: a successful plugin-examples CI run for a particular landing commit
+   proves those examples compiled and exported two named symbols on that runner.
+   The presence of a workflow or this ZIP is not proof that CI has run.
+3. Runtime-tested: not established. No client session or data was used, and no
+   native library was loaded to produce this SDK. Compilation is not runtime proof.
+
+ABI: Windows/Linux x86_64, 53 PluginApi function-pointer slots, no ABI version
+negotiation, no deinit and no callback unregister. Match the actual client build
+before attempting any separately authorized runtime work. A metadata preview
+loads the native library and runs its metadata entrypoint before confirmation;
+preview is not a safe inspection sandbox. Never load untrusted native plugins.
+
+CONTENTS
+  include/           Canonical C, C++ and Zig headers (LF source bytes).
+  examples/include/  Generated identical copies for relative example includes.
+  examples/cpp/      Plain Text C++ source and complete HelloPlugin hello.cpp.
+  examples/rust/     Plain Text Rust cdylib crate, no third-party dependencies.
+  examples/zig/      Plain Text Zig source and Zig 0.14.1 build definition.
+  examples/d/        Plain Text D source and optional DUB configuration.
+  examples/recipes/  C++ chat-counter recipe and config.txt asset.
+  manifest.json     Source identity, evidence scope, toolchain pins, file hashes.
+  BUILDING.txt       This file. No compiled libraries are included.
+
+BUILD IN AN ISOLATED DIRECTORY
+Extract the complete ZIP into a new work directory unrelated to a client profile
+or installation. Do not build inside the client's plugin/assets directory. Keep
+examples/include beside all four language directories. No commands below launch
+MandaGram, load the resulting libraries, or contact TDLib.
+
+Toolchains:
+- C++17: GCC with binutils on Linux; Visual Studio 2022 C++ Build Tools and Windows
+  SDK on Windows, using an x64 Native Tools Command Prompt.
+- Rust 1.85.0 (edition 2021, declared minimum 1.85). No crates to download.
+- Zig 0.14.1; other Zig API versions are not claimed compatible.
+- LDC 1.40.0, ldc2 on PATH. Windows also requires the MSVC/Windows SDK linker.
+  These commands use BetterC and do not require DUB or the D runtime.
+- Linux: libc development files/linker plus binutils for export inspection.
+
+LINUX x64
+Run these commands from the extracted SDK root:
+  cd examples
+  g++ -std=c++17 -O2 -fPIC -shared -Iinclude cpp/hello.cpp -o hello.so
+  g++ -std=c++17 -O2 -fPIC -shared -Iinclude cpp/plugin.cpp -o plain_cpp.so
+  g++ -std=c++17 -O2 -fPIC -shared -Iinclude recipes/chat_counter.cpp -o chat_counter.so
+  cd rust
+  cargo build --release
+  cd ../zig
+  zig build -Doptimize=ReleaseSafe
+  cd ../d
+  ldc2 -betterC -shared -O -relocation-model=pic mandagram_plugin.d -of=plain_d.so
+
+Artifacts relative to examples/:
+  hello.so
+  plain_cpp.so
+  chat_counter.so
+  rust/target/release/libmandagram_plugin_rust.so
+  zig/zig-out/lib/libsample_plugin.so
+  d/plain_d.so
+
+WINDOWS x64
+Run in an x64 Native Tools Command Prompt from the extracted SDK root. Ensure
+rustc reports an x86_64-pc-windows-msvc host; Rust's MSVC toolchain needs the same
+linker environment. PowerShell also works after importing the MSVC environment.
+Do not use Git Bash for the Windows MSVC build: its /usr/bin/link.exe can shadow
+the Visual Studio linker and make Rust linking fail.
+  cd examples
+  cl /nologo /std:c++17 /O2 /EHsc /LD /Iinclude cpp\hello.cpp /link /OUT:hello.dll
+  cl /nologo /std:c++17 /O2 /EHsc /LD /Iinclude cpp\plugin.cpp /link /OUT:plain_cpp.dll
+  cl /nologo /std:c++17 /O2 /EHsc /LD /Iinclude recipes\chat_counter.cpp /link /OUT:chat_counter.dll
+  cd rust
+  cargo build --release
+  cd ..\zig
+  zig build -Doptimize=ReleaseSafe
+  cd ..\d
+  ldc2 -betterC -shared -O mandagram_plugin.d "-of=plain_d.dll"
+Keep the output argument quoted in PowerShell so the .dll suffix is not parsed
+as a separate source filename. size_t is provided by D's implicit object module;
+it is not imported from core.stdc.stddef.
+
+Artifacts relative to examples/:
+  hello.dll
+  plain_cpp.dll
+  chat_counter.dll
+  rust\target\release\mandagram_plugin_rust.dll
+  zig\zig-out\bin\sample_plugin.dll
+  d\plain_d.dll
+
+STATIC EXPORT INSPECTION (DOES NOT LOAD THE LIBRARY)
+Linux:   nm -D --defined-only plain_cpp.so
+Windows: dumpbin /nologo /exports plain_cpp.dll
+Repeat for each artifact. Both mandagram_plugin_metadata and
+mandagram_plugin_init must be exported under these exact undecorated names.
+Export presence alone does not prove signatures, struct layout or runtime safety.
+
+EXAMPLE BEHAVIOR AND LIMITS
+The four Plain Text examples remove a leading '.plain ' prefix. The before-send
+hook returns a borrowed substring which the host copies during the call. This is
+not an escaping or sanitizing operation: a result starting with {"@type": can be
+interpreted as structured content by the host. Returning an empty string is not
+message cancellation. Use ordinary, non-sensitive text when studying the code.
+The chat-counter recipe has its own config.txt; follow the recipe article for
+storage/asset placement instead of copying this entire work directory into a
+client profile. Building does not install either example.
+
+REPRODUCING THE PUBLISHED SDK (LANDING REPOSITORY MAINTAINERS)
+Use Node.js 22 or newer in the landing repository, not in the extracted ZIP:
+  npm run sdk
+  npm run sdk:verify-source -- C:/path/to/read-only/MandaGram
+On Linux the final argument can be /path/to/read-only/MandaGram. That optional
+source verification reads git show at the pinned revision and reports working
+header differences. It does not modify the engine checkout.
+
+The canonical headers are public/include; do not edit public/examples/include.
+scripts/plugin-sdk-source.json pins source identity; scripts/SDK-BUILDING.txt is
+the editable source of these instructions. npm run sdk verifies pinned header
+hashes, regenerates examples/include, then writes public/sdk/manifest.json,
+BUILDING.txt, mandagram-plugin-sdk.zip and mandagram-plugin-sdk.zip.sha256.
+Inputs are explicitly allowlisted; build outputs, caches and local data are not
+packaged. ZIP entries are sorted, uncompressed, UTF-8, with a fixed DOS timestamp
+of 1980-01-01, no host metadata and normalized LF source bytes. Identical source
+inputs produce identical archives across Windows/Linux. The manifest lists file
+hashes except its own; the adjacent .sha256 file hashes the complete ZIP.
+
+npm run build refreshes the SDK before Astro builds the website. It does not
+compile C++, Rust, Zig or D. The separate plugin-examples GitHub Actions workflow
+compiles all four and the recipe on Windows/Linux x64, checks exported symbols,
+and uploads compile-only artifacts. Refer to an actual successful run and its
+landing commit before claiming compilation evidence. Runtime validation remains
+a separate, explicitly authorized operation with isolated test data.

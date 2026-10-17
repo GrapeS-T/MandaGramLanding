@@ -1,0 +1,149 @@
+name: Plugin examples (compile only)
+
+on:
+  pull_request:
+    paths:
+      - 'public/include/**'
+      - 'public/examples/**'
+      - 'scripts/**'
+      - 'package.json'
+      - '.github/workflows/plugin-examples.yml'
+  push:
+    branches: [dev, main, release]
+    paths:
+      - 'public/include/**'
+      - 'public/examples/**'
+      - 'scripts/**'
+      - 'package.json'
+      - '.github/workflows/plugin-examples.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compile:
+    name: ${{ matrix.os }} x64 (no client loading)
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Set up MSVC x64
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@1.85.0
+      - name: Set up Zig
+        uses: mlugg/setup-zig@v2
+        with:
+          version: '0.14.1'
+      - name: Set up LDC
+        uses: dlang-community/setup-dlang@v2
+        with:
+          compiler: ldc-1.40.0
+      - name: Package source SDK and check pinned hashes
+        run: npm run sdk
+      - name: Extract SDK into isolated work directory (Linux)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/plugin-sdk"
+          unzip public/sdk/mandagram-plugin-sdk.zip -d "$RUNNER_TEMP/plugin-sdk"
+      - name: Extract SDK into isolated work directory (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: Expand-Archive -LiteralPath public/sdk/mandagram-plugin-sdk.zip -DestinationPath "$env:RUNNER_TEMP/plugin-sdk"
+      - name: Compile C++ examples (Linux x64)
+        if: runner.os == 'Linux'
+        shell: bash
+        working-directory: ${{ runner.temp }}/plugin-sdk/examples
+        run: |
+          g++ --version
+          g++ -std=c++17 -O2 -fPIC -shared -Iinclude cpp/hello.cpp -o hello.so
+          g++ -std=c++17 -O2 -fPIC -shared -Iinclude cpp/plugin.cpp -o plain_cpp.so
+          g++ -std=c++17 -O2 -fPIC -shared -Iinclude recipes/chat_counter.cpp -o chat_counter.so
+      - name: Compile C++ examples (Windows x64)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        working-directory: ${{ runner.temp }}/plugin-sdk/examples
+        run: |
+          cl /nologo /std:c++17 /O2 /EHsc /LD /Iinclude cpp\hello.cpp /link /OUT:hello.dll
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cl /nologo /std:c++17 /O2 /EHsc /LD /Iinclude cpp\plugin.cpp /link /OUT:plain_cpp.dll
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cl /nologo /std:c++17 /O2 /EHsc /LD /Iinclude recipes\chat_counter.cpp /link /OUT:chat_counter.dll
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Compile Rust cdylib
+        working-directory: ${{ runner.temp }}/plugin-sdk/examples/rust
+        run: |
+          rustc --version
+          cargo build --release --offline
+      - name: Compile Zig dynamic library
+        shell: bash
+        working-directory: ${{ runner.temp }}/plugin-sdk/examples/zig
+        run: |
+          zig version
+          zig build -Doptimize=ReleaseSafe
+      - name: Compile D BetterC library (Linux x64)
+        if: runner.os == 'Linux'
+        shell: bash
+        working-directory: ${{ runner.temp }}/plugin-sdk/examples/d
+        run: |
+          ldc2 --version
+          ldc2 -betterC -shared -O -relocation-model=pic mandagram_plugin.d -of=plain_d.so
+      - name: Compile D BetterC library (Windows x64)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        working-directory: ${{ runner.temp }}/plugin-sdk/examples/d
+        run: |
+          ldc2 --version
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ldc2 -betterC -shared -O mandagram_plugin.d "-of=plain_d.dll"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Inspect exported symbols without loading libraries (Linux)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          node scripts/check-plugin-exports.mjs \
+            "$RUNNER_TEMP/plugin-sdk/examples/hello.so" \
+            "$RUNNER_TEMP/plugin-sdk/examples/plain_cpp.so" \
+            "$RUNNER_TEMP/plugin-sdk/examples/chat_counter.so" \
+            "$RUNNER_TEMP/plugin-sdk/examples/rust/target/release/libmandagram_plugin_rust.so" \
+            "$RUNNER_TEMP/plugin-sdk/examples/zig/zig-out/lib/libsample_plugin.so" \
+            "$RUNNER_TEMP/plugin-sdk/examples/d/plain_d.so"
+      - name: Inspect exported symbols without loading libraries (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          node scripts/check-plugin-exports.mjs `
+            "$env:RUNNER_TEMP/plugin-sdk/examples/hello.dll" `
+            "$env:RUNNER_TEMP/plugin-sdk/examples/plain_cpp.dll" `
+            "$env:RUNNER_TEMP/plugin-sdk/examples/chat_counter.dll" `
+            "$env:RUNNER_TEMP/plugin-sdk/examples/rust/target/release/mandagram_plugin_rust.dll" `
+            "$env:RUNNER_TEMP/plugin-sdk/examples/zig/zig-out/bin/sample_plugin.dll" `
+            "$env:RUNNER_TEMP/plugin-sdk/examples/d/plain_d.dll"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Upload source and compile-only evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-examples-${{ matrix.os }}-x64-${{ github.sha }}
+          if-no-files-found: error
+          path: |
+            public/sdk/*
+            ${{ runner.temp }}/plugin-sdk/examples/*.so
+            ${{ runner.temp }}/plugin-sdk/examples/*.dll
+            ${{ runner.temp }}/plugin-sdk/examples/rust/target/release/*.so
+            ${{ runner.temp }}/plugin-sdk/examples/rust/target/release/*.dll
+            ${{ runner.temp }}/plugin-sdk/examples/zig/zig-out/lib/*.so
+            ${{ runner.temp }}/plugin-sdk/examples/zig/zig-out/bin/*.dll
+            ${{ runner.temp }}/plugin-sdk/examples/d/*.so
+            ${{ runner.temp }}/plugin-sdk/examples/d/*.dll

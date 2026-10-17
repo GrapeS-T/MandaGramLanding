@@ -25,6 +25,14 @@ export const teamRu: TeamMember[] = [
     tone: "tcard--kpictalluk",
     telegram: "https://t.me/Strateg356",
     avatar: "/assets/team/kpictalluk.png"
+  },
+  {
+    name: "extera.cat.furry",
+    role: "разработчик",
+    tags: ["Разработка"],
+    tone: "tcard--qidok",
+    telegram: "https://t.me/qidok",
+    avatar: "/assets/team/qidok.png"
   }
 ];
 
@@ -45,5 +53,13 @@ export const teamEn: TeamMember[] = [
     tone: "tcard--kpictalluk",
     telegram: "https://t.me/KPuCTaJluK",
     avatar: "/assets/team/kpictalluk.png"
+  },
+  {
+    name: "extera.cat.furry",
+    role: "Developer",
+    tags: ["Development"],
+    tone: "tcard--qidok",
+    telegram: "https://t.me/qidok",
+    avatar: "/assets/team/qidok.png"
   }
 ];
