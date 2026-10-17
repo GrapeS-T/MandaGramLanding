@@ -63,8 +63,8 @@
   },
   "files": {
     "BUILDING.txt": {
-      "sha256": "3c7d9f2d5103a2c3e25cd17ba6aeb7ebc6fd7f33f9a20a866b0d638384569998",
-      "bytes": 7290
+      "sha256": "076bcd66da19f7df778e23b4e12ae00276bf184795f46d6226f3692909c9bb67",
+      "bytes": 7424
     },
     "examples/cpp/hello.cpp": {
       "sha256": "8d17e8e0ba834534653f6515572fa068d2375ff6bbde9575ede36b0b0e0cc2f6",
@@ -79,8 +79,8 @@
       "bytes": 256
     },
     "examples/d/mandagram_plugin.d": {
-      "sha256": "2397624bc4f2b7d67cf1ea64748477349dd756b46dd6a004bd65ae06db2165ed",
-      "bytes": 5989
+      "sha256": "1776dc452eab70de42118e69521f2cf34cff7d03b56c7548c18ead38de333e0e",
+      "bytes": 5996
     },
     "examples/include/mandagram_plugin.h": {
       "sha256": "3046fa914fa2766d412c41ce63cbaf63f23ca7bcd6c00aa2b59ca3b3d5176d0e",

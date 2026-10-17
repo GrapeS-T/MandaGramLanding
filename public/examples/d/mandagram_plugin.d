@@ -76,7 +76,7 @@ struct PluginApi {
     jobject function(jobject mod, uint argb, float corner_radius_dp) modifier_background;
     jobject function(jobject mod, float width_dp, uint argb, float corner_radius_dp) modifier_border;
     jobject function(jobject mod, jobject on_click_lambda) modifier_clickable;
-    jobject function(jobject scope, jobject mod, float weight) modifier_weight;
+    jobject function(jobject scope_handle, jobject mod, float weight) modifier_weight;
     void function(jobject composer, jobject mod, jobject content_lambda) compose_row;
     void function(jobject composer, jobject mod, jobject content_lambda) compose_column;
     void function(jobject composer, jobject mod, jobject content_lambda) compose_box;
