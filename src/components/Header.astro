@@ -37,6 +37,10 @@ const navItems = lang === 'en' ? [
   </nav>
 
   <div class="tools">
+    <button type="button" class="icon-btn st theme-toggle" data-theme-toggle="" data-label-light={lang === 'en' ? 'Switch to light theme' : 'Включить светлую тему'} data-label-dark={lang === 'en' ? 'Switch to dark theme' : 'Включить тёмную тему'} aria-label={lang === 'en' ? 'Switch to light theme' : 'Включить светлую тему'}>
+      <svg class="ic theme-moon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><path d="M20.8 13.1A9 9 0 0 1 10.9 3.2a9 9 0 1 0 9.9 9.9Z" /></svg>
+      <svg class="ic theme-sun" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4" /><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5" /></svg>
+    </button>
     <div class="seg" role="group" aria-label={lang === 'en' ? 'Color theme' : 'Тема оформления'}>
       <button type="button" class="st" data-theme-btn="dark" aria-label={lang === 'en' ? 'Dark theme' : 'Тёмная тема'} aria-pressed="true">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="ic" aria-hidden="true" focusable="false"><path d="M10 7C10 10.866 13.134 14 17 14C18.9584 14 20.7288 13.1957 21.9995 11.8995C22 11.933 22 11.9665 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C12.0335 2 12.067 2 12.1005 2.00049C10.8043 3.27124 10 5.04157 10 7ZM4 12C4 16.4183 7.58172 20 12 20C15.0583 20 17.7158 18.2839 19.062 15.7621C18.3945 15.9187 17.7035 16 17 16C12.0294 16 8 11.9706 8 7C8 6.29648 8.08133 5.60549 8.2379 4.93799C5.71612 6.28417 4 8.9417 4 12Z"></path></svg>
@@ -70,6 +74,7 @@ const navItems = lang === 'en' ? [
       class="icon-btn st menu-btn" 
       type="button" 
       data-pop="pop-nav" 
+      aria-controls="pop-nav"
       aria-expanded="false" 
       aria-haspopup="true" 
       aria-label={lang === 'en' ? 'Open navigation' : 'Открыть навигацию'}
@@ -84,8 +89,70 @@ const navItems = lang === 'en' ? [
       {navItems.map(item => (
         <a class="st" href={item.href} role="menuitem">{item.label}</a>
       ))}
-      <a class="st" href="/kb/" role="menuitem">{lang === 'en' ? 'Knowledge Base' : 'База знаний'}</a>
       <a class="st" href="https://t.me/MandaGram" target="_blank" rel="noopener" role="menuitem">Telegram</a>
+      <div class="mobile-locales" role="group" aria-label={lang === 'en' ? 'Language choice' : 'Выбор языка'}>
+        <span class="locale-label">{lang === 'en' ? 'Language' : 'Язык'}</span>
+        <a class={`st ${lang === 'ru' ? 'is-cur' : ''}`} href="/" data-set-lang="ru" role="menuitem" aria-current={lang === 'ru' ? 'true' : undefined}>Русский</a>
+        <a class={`st ${lang === 'en' ? 'is-cur' : ''}`} href="/en/" data-set-lang="en" role="menuitem" aria-current={lang === 'en' ? 'true' : undefined}>English</a>
+      </div>
     </div>
   </div>
 </header>
+
+<style>
+  .theme-toggle, .mobile-locales { display: none; }
+
+  @media (max-width: 759px) {
+    .hdr, .hdr.is-stuck {
+      height: 64px;
+      padding: 0 16px;
+      background: var(--bg);
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      box-shadow: 0 1px 0 rgb(var(--state) / .08);
+    }
+    .hdr .wordmark { gap: 8px; min-height: 44px; font-size: 18px; letter-spacing: -.04em; }
+    .hdr .wordmark span { display: inline; }
+    .hdr .wordmark .ic { width: 26px; height: 26px; }
+    .hdr .nav, .hdr .seg, .hdr .lang, .hdr #pop-lang { display: none; }
+    .hdr .tools { flex: none; gap: 6px; }
+    .hdr .theme-toggle, .hdr .menu-btn {
+      display: grid;
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      padding: 0;
+      border-radius: 16px;
+      color: var(--text);
+    }
+    .theme-toggle .ic { grid-area: 1 / 1; width: 22px; height: 22px; }
+    .theme-sun { display: none; }
+    :global(html[data-theme="light"]) .theme-sun { display: block; }
+    :global(html[data-theme="light"]) .theme-moon { display: none; }
+    .hdr #pop-nav {
+      left: 16px !important;
+      right: 16px;
+      top: 72px !important;
+      width: auto;
+      min-width: 0;
+      max-height: calc(100dvh - 88px);
+      overflow-y: auto;
+      padding: 8px;
+      border-radius: 22px;
+      background: var(--surface);
+      transform-origin: top right;
+    }
+    #pop-nav > a { min-height: 48px; padding: 12px 16px; font-size: 16px; }
+    .mobile-locales {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin: 8px 8px 0;
+      padding: 12px 0 4px;
+      border-top: 1px solid rgb(var(--state) / .1);
+    }
+    .locale-label { flex: 1; font-size: 13px; color: var(--text-3); }
+    .mobile-locales a { width: auto; min-height: 44px; padding: 10px 12px; font-size: 14px; justify-content: center; }
+    .mobile-locales a.is-cur { background: var(--selected); color: var(--text); }
+  }
+</style>

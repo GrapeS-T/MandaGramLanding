@@ -1253,7 +1253,7 @@ html:has(.sheet[open]) {
 
 @media (width<=759px) {
   .kbi-hero {
-    padding:calc(var(--header-h) + 40px) 0 40px;
+    padding:calc(var(--header-h) + 24px) 0 28px;
   }
 
   .kbi-head {
@@ -1267,8 +1267,8 @@ html:has(.sheet[open]) {
   }
 
   .kbi-head h1 {
-    font-size:34px;
-    line-height:1.1;
+    font-size:clamp(28px, 7.5vw, 34px);
+    line-height:1.15;
   }
 
   .kbs-key {
@@ -1276,7 +1276,22 @@ html:has(.sheet[open]) {
   }
 
   .kbi-pop {
-    justify-content:flex-start;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+    width:100%;
+  }
+
+  .kbi-pop .chip {
+    min-height:48px;
+    height:auto;
+    padding:10px 12px;
+    white-space:normal;
+    line-height:1.4;
+  }
+
+  .kbi-pop .chip:last-child:nth-child(odd) {
+    grid-column:1 / -1;
   }
 
   .kb-glows .g1 {
@@ -1302,8 +1317,8 @@ html:has(.sheet[open]) {
 
   .kbi-groups {
     grid-template-columns:minmax(0,1fr);
-    gap:8px;
-    padding-bottom:64px;
+    gap:12px;
+    padding-bottom:24px;
   }
 
   .kgroup {
@@ -1311,7 +1326,7 @@ html:has(.sheet[open]) {
   }
 
   .kbi-help {
-    padding-bottom:80px;
+    padding-bottom:24px;
   }
 
   .khelp {
@@ -1334,7 +1349,7 @@ html:has(.sheet[open]) {
   }
 
   .kba.wrap {
-    padding-bottom:80px;
+    padding-bottom:32px;
   }
 
   .kba-head {
@@ -1362,6 +1377,14 @@ html:has(.sheet[open]) {
   .prose {
     font-size:16px;
     line-height:1.65;
+  }
+
+  .prose section {
+    margin-bottom:32px;
+  }
+
+  .prose section > :is(h2,h3):first-child {
+    margin-top:0;
   }
 
   .prose :not(pre) > code {
