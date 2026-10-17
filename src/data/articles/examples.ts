@@ -44,7 +44,7 @@ return api-&gt;register_message_send_hook(before_send, nullptr, 0) == 0;</pre></
         <h2>Пример на D (betterC)</h2>
         <p>Используйте <strong>LDC 1.40.0</strong> для x64 и системный linker; в Windows подготовьте Native Tools x64. Скачайте <a href="/examples/d/mandagram_plugin.d" download>mandagram_plugin.d</a> и <a href="/examples/d/dub.json" download>dub.json</a>. Один модуль содержит C-совместимые структуры, таблицу API, метаданные и обработчик.</p>
         <div class="code-block"><div class="code-header"><span>Linux · из examples/d/</span></div><div class="code-content"><pre>ldc2 -betterC -shared -O -relocation-model=pic mandagram_plugin.d -of=plain_d.so</pre></div></div>
-        <div class="code-block"><div class="code-header"><span>Windows · из examples/d/</span></div><div class="code-content"><pre>ldc2 -betterC -shared -O mandagram_plugin.d -of=plain_d.dll</pre></div></div>
+        <div class="code-block"><div class="code-header"><span>Windows · из examples/d/</span></div><div class="code-content"><pre>ldc2 -betterC -shared -O mandagram_plugin.d "-of=plain_d.dll"</pre></div></div>
         <p>Устанавливаемый файл — <code>examples/d/plain_d.so</code> либо <code>examples/d/plain_d.dll</code>. Эти команды явно задают имя артефакта; DUB-конфигурация использует другое targetName. Функции имеют extern(C), обработчик не требует GC или D runtime. Не добавляйте собственный DllMainCRTStartup и не подменяйте JNI-таблицы.</p>
       </section>
 

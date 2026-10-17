@@ -107,7 +107,7 @@ jobs:
         run: |
           ldc2 --version
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          ldc2 -betterC -shared -O mandagram_plugin.d -of=plain_d.dll
+          ldc2 -betterC -shared -O mandagram_plugin.d "-of=plain_d.dll"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Inspect exported symbols without loading libraries (Linux)
         if: runner.os == 'Linux'
