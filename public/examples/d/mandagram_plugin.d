@@ -1,5 +1,4 @@
 module mandagram_plugin;
-import core.stdc.stddef : size_t;
 import core.stdc.string : strncmp;
 extern(C):
 alias jobject = void*;

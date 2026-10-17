@@ -85,7 +85,10 @@ the Visual Studio linker and make Rust linking fail.
   cd ..\zig
   zig build -Doptimize=ReleaseSafe
   cd ..\d
-  ldc2 -betterC -shared -O mandagram_plugin.d -of=plain_d.dll
+  ldc2 -betterC -shared -O mandagram_plugin.d "-of=plain_d.dll"
+Keep the output argument quoted in PowerShell so the .dll suffix is not parsed
+as a separate source filename. size_t is provided by D's implicit object module;
+it is not imported from core.stdc.stddef.
 
 Artifacts relative to examples/:
   hello.dll
