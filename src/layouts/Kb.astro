@@ -213,6 +213,12 @@ const pageTitle = isDoc ? `${title} — MandaGram Desktop` : `${title} — До�
 
             const targetLink = links[activeIndex];
             if (ind && targetLink && list) {
+              const top = targetLink.offsetTop;
+              const bottom = top + targetLink.offsetHeight;
+              if (top < list.scrollTop) list.scrollTop = top;
+              else if (bottom > list.scrollTop + list.clientHeight) {
+                list.scrollTop = bottom - list.clientHeight;
+              }
               ind.style.opacity = "1";
               ind.style.height = `${targetLink.offsetHeight}px`;
               ind.style.transform = `translateY(${list.offsetTop + targetLink.offsetTop - list.scrollTop}px)`;
@@ -229,6 +235,14 @@ const pageTitle = isDoc ? `${title} — MandaGram Desktop` : `${title} — До�
           window.addEventListener("resize", () => {
             activeIndex = -2;
             onScroll();
+          }, { passive: true });
+
+          list?.addEventListener("scroll", () => {
+            const targetLink = links[activeIndex];
+            if (!ind || !targetLink) return;
+            const top = targetLink.offsetTop - list.scrollTop;
+            ind.style.opacity = top < 0 || top + targetLink.offsetHeight > list.clientHeight ? "0" : "1";
+            ind.style.transform = `translateY(${list.offsetTop + top}px)`;
           }, { passive: true });
 
           onScroll();

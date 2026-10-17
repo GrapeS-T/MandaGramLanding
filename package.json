@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build",
+    "build": "npm run sdk && astro build",
+    "sdk": "node scripts/build-plugin-sdk.mjs",
+    "sdk:verify-source": "node scripts/build-plugin-sdk.mjs --verify-source",
+    "examples:exports": "node scripts/check-plugin-exports.mjs",
     "preview": "astro preview"
   },
   "dependencies": {

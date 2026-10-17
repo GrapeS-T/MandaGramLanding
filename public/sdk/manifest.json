@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "engine": {
+    "repository": "https://github.com/GrapeS-T/MandaGram",
+    "commit": "259fc5a38b64a12c85121838278f78ee72541dfb"
+  },
+  "target": {
+    "architectures": [
+      "x86_64"
+    ],
+    "platforms": [
+      "windows",
+      "linux"
+    ],
+    "pluginApiSlots": 53,
+    "versionNegotiation": false,
+    "deinitOrUnregister": false
+  },
+  "hashPolicy": "SHA256 of UTF-8 source bytes with CRLF normalized to LF; header hashes equal the committed engine blobs. ZIP entries use the same LF bytes.",
+  "headers": [
+    {
+      "file": "mandagram_plugin.h",
+      "enginePath": "src/native/include/mandagram_plugin.h",
+      "sha256": "3046fa914fa2766d412c41ce63cbaf63f23ca7bcd6c00aa2b59ca3b3d5176d0e"
+    },
+    {
+      "file": "mandagram_plugin.hpp",
+      "enginePath": "src/native/include/mandagram_plugin.hpp",
+      "sha256": "70e2c166664d87fb0c0dedb42bbe21e53f936186b07d130434fe2ee412ed1ea4"
+    },
+    {
+      "file": "mandagram_plugin.zig",
+      "enginePath": "src/native/include/mandagram_plugin.zig",
+      "sha256": "9ff8206c5b548cab54f4defcc0bf96fb6170b8137d3b4d211686ba38213ff902"
+    }
+  ],
+  "evidence": {
+    "sourceMatched": {
+      "status": "verified",
+      "scope": "The three headers match git show of the pinned engine revision after checkout CRLF normalization. The engine header working tree had no content changes at source audit. This does not certify the rest of the checkout or a released client binary."
+    },
+    "compile": {
+      "status": "not-established-by-this-manifest",
+      "scope": "The separate plugin-examples workflow compiles Windows/Linux x64 examples and checks exported symbols. Only a successful run at a specified landing revision is compilation evidence; packaging does not invoke a compiler."
+    },
+    "runtime": {
+      "status": "not-tested",
+      "scope": "No native library was loaded in MandaGram and no client sessions or data were used. Source or compile evidence is not runtime compatibility evidence."
+    }
+  },
+  "toolchains": {
+    "node": "22",
+    "cpp": "C++17; GCC on Linux, MSVC x64 on Windows",
+    "rust": "1.85.0",
+    "zig": "0.14.1",
+    "ldc": "1.40.0"
+  },
+  "archive": {
+    "format": "ZIP STORE",
+    "timestamps": "1980-01-01T00:00:00",
+    "paths": "sorted UTF-8",
+    "contents": "Source only; no precompiled plugins. Manifest excludes its own hash."
+  },
+  "files": {
+    "BUILDING.txt": {
+      "sha256": "3c7d9f2d5103a2c3e25cd17ba6aeb7ebc6fd7f33f9a20a866b0d638384569998",
+      "bytes": 7290
+    },
+    "examples/cpp/hello.cpp": {
+      "sha256": "8d17e8e0ba834534653f6515572fa068d2375ff6bbde9575ede36b0b0e0cc2f6",
+      "bytes": 409
+    },
+    "examples/cpp/plugin.cpp": {
+      "sha256": "c0b845d573eb33e4a980ba658cc806ad56dd057e83b6127aea4d01a23457129c",
+      "bytes": 821
+    },
+    "examples/d/dub.json": {
+      "sha256": "e4acf5c1e890f8ad391d641fc090cb4472a2190f12069c78a1375812b46f50dd",
+      "bytes": 256
+    },
+    "examples/d/mandagram_plugin.d": {
+      "sha256": "2397624bc4f2b7d67cf1ea64748477349dd756b46dd6a004bd65ae06db2165ed",
+      "bytes": 5989
+    },
+    "examples/include/mandagram_plugin.h": {
+      "sha256": "3046fa914fa2766d412c41ce63cbaf63f23ca7bcd6c00aa2b59ca3b3d5176d0e",
+      "bytes": 5915
+    },
+    "examples/include/mandagram_plugin.hpp": {
+      "sha256": "70e2c166664d87fb0c0dedb42bbe21e53f936186b07d130434fe2ee412ed1ea4",
+      "bytes": 12004
+    },
+    "examples/include/mandagram_plugin.zig": {
+      "sha256": "9ff8206c5b548cab54f4defcc0bf96fb6170b8137d3b4d211686ba38213ff902",
+      "bytes": 11910
+    },
+    "examples/recipes/chat_counter.cpp": {
+      "sha256": "66bd714f69f40a59c76984815bd66cce78a4725b56144a2a6528c32000b32376",
+      "bytes": 4469
+    },
+    "examples/recipes/config.txt": {
+      "sha256": "16f4affa3003cb1ae3f22d5e0be86a5b6fc16bbf40662629df0aa5ad0ff52e15",
+      "bytes": 10
+    },
+    "examples/rust/Cargo.toml": {
+      "sha256": "2ef8c2e043be696eac87d6b54250632e2bf54a01551a1b2ba3548eeddfdc74e7",
+      "bytes": 180
+    },
+    "examples/rust/src/lib.rs": {
+      "sha256": "55ae87cebd1cca37190fbbd18810504148593fba1c608b062ac8fbc61700f81d",
+      "bytes": 8272
+    },
+    "examples/zig/build.zig": {
+      "sha256": "81067fe8898fb4119e90ee52d922330fd27a18c64fd979748ec39f537e557057",
+      "bytes": 690
+    },
+    "examples/zig/plugin.zig": {
+      "sha256": "3d5fca4387ef8e636d5aacf18be7d42fe7c5c967bb9b1adbf60ffd6e7d32dd97",
+      "bytes": 893
+    },
+    "include/mandagram_plugin.h": {
+      "sha256": "3046fa914fa2766d412c41ce63cbaf63f23ca7bcd6c00aa2b59ca3b3d5176d0e",
+      "bytes": 5915
+    },
+    "include/mandagram_plugin.hpp": {
+      "sha256": "70e2c166664d87fb0c0dedb42bbe21e53f936186b07d130434fe2ee412ed1ea4",
+      "bytes": 12004
+    },
+    "include/mandagram_plugin.zig": {
+      "sha256": "9ff8206c5b548cab54f4defcc0bf96fb6170b8137d3b4d211686ba38213ff902",
+      "bytes": 11910
+    }
+  }
+}

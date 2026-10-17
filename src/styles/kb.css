@@ -976,6 +976,10 @@
   display:block;
 }
 
+.kba-toc li a, .sheet-toc a {
+  overflow-wrap:anywhere;
+}
+
 .kba-toc li.d3 a {
   padding-left:26px;
   font-size:12.5px;

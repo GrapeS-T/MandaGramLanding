@@ -73,14 +73,21 @@ const { size = 'sm', idPrefix = 'kbs', placeholder = 'Поиск по стать
         }).catch(error => { index = undefined; throw error; });
         const rows = await index;
         if (current !== generation) return;
-        const matches = rows.filter(([, title, category, text]) => {
+        const matches = rows.map(row => {
+          const [, title, category, text] = row;
+          const heading = normalize(title);
           const haystack = normalize(`${title} ${category} ${text}`);
-          return words.every(word => haystack.includes(word));
-        }).slice(0, 8);
+          const score = heading === words.join(' ') ? 3
+            : words.every(word => heading.includes(word)) ? 2 : 1;
+          return { row, score, matches: words.every(word => haystack.includes(word)) };
+        }).filter(result => result.matches)
+          .sort((a, b) => b.score - a.score)
+          .slice(0, 8).map(result => result.row);
         matches.forEach(([slug, title, category], position) => {
           const link = document.createElement('a');
           link.className = 'kbs-hit';
-          link.href = `/kb/${slug}/`;
+          const [article, anchor] = slug.split('#');
+          link.href = `/kb/${article}/${anchor ? `#${anchor}` : ''}`;
           link.id = `${results.id}-${position}`;
           link.setAttribute('role', 'option');
           link.setAttribute('aria-selected', 'false');
@@ -91,10 +98,11 @@ const { size = 'sm', idPrefix = 'kbs', placeholder = 'Поиск по стать
           detail.className = 'h-s';
           detail.textContent = category;
           link.append(heading, detail);
+          link.addEventListener('click', close);
           results.append(link);
         });
-        status.textContent = matches.length ? `Найдено статей: ${matches.length}` : 'Статьи не найдены';
-        if (!matches.length) results.textContent = 'Статьи не найдены';
+        status.textContent = matches.length ? `Найдено результатов: ${matches.length}` : 'Совпадений не найдено';
+        if (!matches.length) results.textContent = 'Совпадений не найдено';
       } catch {
         if (current !== generation) return;
         results.textContent = 'Не удалось загрузить поиск. Выберите статью в каталоге ниже.';
