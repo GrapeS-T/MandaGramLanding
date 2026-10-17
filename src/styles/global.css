@@ -2227,11 +2227,37 @@ html:not(.vt-theme)::view-transition-new(root),::view-transition-new(kb-side):on
   }
 
   .hdr .wordmark {
+    display:inline-flex;
+    flex:none;
+    justify-content:center;
+    width:44px;
+    height:44px;
+  }
+
+  .hdr .wordmark span {
     display:none;
   }
 
   .hdr .tools {
     flex:1;
+    gap:4px;
+    justify-content:flex-end;
+  }
+
+  .hdr .seg button, .hdr .icon-btn {
+    min-width:44px;
+    min-height:44px;
+  }
+
+  .hdr .pop--menu {
+    max-width:calc(100vw - 24px);
+    max-height:calc(100dvh - var(--header-h) - 20px);
+    overflow-y:auto;
+  }
+
+  .hdr .pop--menu a {
+    min-height:44px;
+    font-size:15px;
   }
 
   .hdr .tools .menu-btn {
@@ -2247,7 +2273,10 @@ html:not(.vt-theme)::view-transition-new(root),::view-transition-new(kb-side):on
   }
 
   .hero {
-    height:885px;
+    height:auto;
+    min-height:100svh;
+    padding-block:calc(var(--header-h) + 32px) 48px;
+    grid-template-columns:minmax(0,1fr);
   }
 
   .hero .g1 {
@@ -2279,8 +2308,9 @@ html:not(.vt-theme)::view-transition-new(root),::view-transition-new(kb-side):on
   }
 
   .hero-in {
-    gap:36px;
+    gap:24px;
     width:100%;
+    min-width:0;
     margin-top:0;
     padding-inline:16px;
   }
@@ -2291,12 +2321,14 @@ html:not(.vt-theme)::view-transition-new(root),::view-transition-new(kb-side):on
 
   .hero h1 {
     letter-spacing:-.035em;
-    font-size:48px;
+    font-size:clamp(30px, 8.5vw, 48px);
     line-height:normal;
   }
 
   .hero-copy {
     gap:4px;
+    width:100%;
+    min-width:0;
   }
 
   .hero-copy .chips {
@@ -2569,9 +2601,6 @@ html:not(.vt-theme)::view-transition-new(root),::view-transition-new(kb-side):on
     zoom:.9;
   }
 
-  .hero h1 {
-    font-size:44px;
-  }
 
 }
 
@@ -2580,9 +2609,6 @@ html:not(.vt-theme)::view-transition-new(root),::view-transition-new(kb-side):on
     zoom:.85;
   }
 
-  .hero h1 {
-    font-size:40px;
-  }
 
 }
 

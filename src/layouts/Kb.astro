@@ -140,6 +140,9 @@ const pageTitle = isDoc ? `${title} — MandaGram Desktop` : `${title} — До�
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="ic" aria-hidden="true" focusable="false"><path d="M11.9997 10.5865L16.9495 5.63672L18.3637 7.05093L13.4139 12.0007L18.3637 16.9504L16.9495 18.3646L11.9997 13.4149L7.04996 18.3646L5.63574 16.9504L10.5855 12.0007L5.63574 7.05093L7.04996 5.63672L11.9997 10.5865Z"></path></svg>
           </button>
         </div>
+        <div class="sheet-search">
+          <KbSearch size="sm" idPrefix="kbs-mobile" placeholder="Поиск по статьям и API" />
+        </div>
         <div class="sheet-body">
           <KbSidebar currentSlug={currentSlug} isSheet={true} />
         </div>

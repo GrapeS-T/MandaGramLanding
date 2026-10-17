@@ -1040,6 +1040,8 @@
 
 .sheet[open] {
   translate:0;
+  display:flex;
+  flex-direction:column;
 }
 
 @starting-style {
@@ -1078,18 +1080,48 @@
 .sheet-close {
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
+  width:44px;
+  height:44px;
   border-radius: 50%;
   color: var(--text);
   background: var(--surface-hi);
 }
 
 .sheet-body {
-  max-height: calc(82dvh - 74px);
+  min-height:0;
+  flex:1;
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: 16px 20px calc(24px + env(safe-area-inset-bottom));
+}
+
+.sheet-head, .sheet-search {
+  flex:none;
+}
+
+.sheet-search {
+  padding:12px 20px 0;
+}
+
+.sheet-search .kbs-res {
+  position:static;
+  width:100%;
+  max-height:28dvh;
+  box-shadow:none;
+}
+
+.sheet-search .kbs .sfield input {
+  font-size:16px;
+}
+
+.sheet .knav {
+  overflow:visible;
+  mask:none;
+  padding-bottom:0;
+}
+
+.sheet-toc a {
+  min-height:44px;
 }
 
 .sheet-in {
@@ -1175,7 +1207,7 @@ html:has(.sheet[open]) {
 
   .kba-bar .btn {
     border-radius:20px;
-    height:40px;
+    height:44px;
     padding-inline:16px;
     font-size:14px;
   }
@@ -1198,10 +1230,15 @@ html:has(.sheet[open]) {
   .kba.wrap {
     padding-top:calc(var(--header-h) + 16px);
     grid-template-columns:minmax(0,880px);
+    gap:0;
   }
 
   .kba-side {
     display:none;
+  }
+
+  .kba > .kba-main {
+    margin-top:0;
   }
 
   .kba .kba-sections {
@@ -1310,9 +1347,9 @@ html:has(.sheet[open]) {
   }
 
   .kba-bar {
-    top:calc(var(--header-h) - 4px);
+    top:var(--header-h);
     z-index:20;
-    background:linear-gradient(var(--bg) 70%, transparent);
+    background:var(--bg);
     margin-inline:-16px;
     padding:4px 16px 8px;
     position:sticky;
@@ -1323,8 +1360,36 @@ html:has(.sheet[open]) {
   }
 
   .prose {
-    font-size:15.5px;
+    font-size:16px;
     line-height:1.65;
+  }
+
+  .prose :not(pre) > code {
+    overflow-wrap:anywhere;
+  }
+
+  .prose pre {
+    max-width:100%;
+    padding:14px;
+    font-size:13px;
+    overscroll-behavior-x:contain;
+  }
+
+  .kba-head h1 {
+    font-size:clamp(26px, 7.5vw, 32px);
+    overflow-wrap:anywhere;
+  }
+
+  .kbi-hero + .kbi-groups {
+    margin-top:0;
+  }
+
+  .kbs .sfield input {
+    font-size:16px;
+  }
+
+  .kbs-hit {
+    overflow-wrap:anywhere;
   }
 
   .prose h2 {
@@ -1337,8 +1402,8 @@ html:has(.sheet[open]) {
     font-size:18px;
   }
 
-  .prose h2,.prose h3,.prose h4 {
-    scroll-margin-top:calc(var(--header-h) + 64px);
+  .prose :is(section[id], h2, h3, h4) {
+    scroll-margin-top:64px;
   }
 
   .kb-anchor {
