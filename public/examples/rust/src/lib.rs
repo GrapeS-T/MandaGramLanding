@@ -1,37 +1,18 @@
-use std::ffi::{CStr, CString};
-use std::os::raw::{c_char, c_void};
-use std::sync::atomic::{AtomicPtr, Ordering};
-
-pub const PLUGIN_NAME: &str = "RustSecurityPlugin";
-
+// C layout mirrored from public/include/mandagram_plugin.h; no JNI pointers.
+use std::ffi::{c_char, c_void, CStr};
+pub type JObject = *mut c_void;
 #[repr(C)]
 pub struct HookParam {
-    pub env: *mut c_void,
-    pub this_ptr: *mut c_void,
-    pub args: *mut *mut c_void,
+    pub this_ptr: JObject,
+    pub args: *mut JObject,
     pub args_count: u32,
     pub padding: u32,
-    pub result: *mut c_void,
+    pub result: JObject,
     pub return_early: u8,
     pub has_result: u8,
     pub reserved: u16,
+    pub padding2: u32,
 }
-
-impl HookParam {
-    pub fn cancel(&mut self) {
-        self.return_early = 1;
-    }
-
-    pub fn set_result(&mut self, res: *mut c_void) {
-        self.result = res;
-        self.has_result = 1;
-        self.return_early = 1;
-    }
-}
-
-pub type HookBeforeFn = unsafe extern "C" fn(param: *mut HookParam);
-pub type HookAfterFn = unsafe extern "C" fn(param: *mut HookParam);
-
 #[repr(C)]
 pub struct PluginMetadata {
     pub name: *const c_char,
@@ -39,123 +20,93 @@ pub struct PluginMetadata {
     pub author: *const c_char,
     pub description: *const c_char,
 }
-
-static PLUGIN_NAME_C: &[u8] = b"Rust Security Plugin\0";
-static PLUGIN_VERSION_C: &[u8] = b"1.1.0\0";
-static PLUGIN_AUTHOR_C: &[u8] = b"MandaGram Community\0";
-static PLUGIN_DESC_C: &[u8] = b"Rust native plugin\0";
-
-static METADATA: PluginMetadata = PluginMetadata {
-    name: PLUGIN_NAME_C.as_ptr() as *const c_char,
-    version: PLUGIN_VERSION_C.as_ptr() as *const c_char,
-    author: PLUGIN_AUTHOR_C.as_ptr() as *const c_char,
-    description: PLUGIN_DESC_C.as_ptr() as *const c_char,
-};
-
-#[no_mangle]
-pub extern "C" fn mandagram_plugin_metadata() -> *const PluginMetadata {
-    &METADATA
-}
-
+// The metadata below contains only immutable, static NUL-terminated strings.
+unsafe impl Sync for PluginMetadata {}
+pub type HookBeforeFn = Option<unsafe extern "C" fn(*mut HookParam)>;
+pub type HookAfterFn = HookBeforeFn;
+pub type ComposableFn = Option<unsafe extern "C" fn(JObject, usize)>;
+pub type ScopedComposableFn = Option<unsafe extern "C" fn(JObject, JObject, usize)>;
+pub type UpdateHookFn = Option<unsafe extern "C" fn(*const c_char, usize) -> bool>;
+pub type MessageBeforeSendFn = Option<unsafe extern "C" fn(i64, *const c_char, usize) -> *const c_char>;
+pub type MessageAfterSendFn = Option<unsafe extern "C" fn(i64, i64, usize)>;
+pub type MessageReceiveFn = Option<unsafe extern "C" fn(i64, i64, *const c_char, usize)>;
+pub type ChatActionClickFn = Option<unsafe extern "C" fn(i64, usize)>;
 #[repr(C)]
 pub struct PluginApi {
-    pub register_hook: unsafe extern "C" fn(
-        class_name: *const c_char,
-        method_name: *const c_char,
-        method_descriptor: *const c_char,
-        before_cb: Option<HookBeforeFn>,
-        after_cb: Option<HookAfterFn>,
-    ) -> i32,
-    pub log_info: unsafe extern "C" fn(tag: *const c_char, msg: *const c_char),
-    pub log_error: unsafe extern "C" fn(tag: *const c_char, msg: *const c_char),
+    pub register_hook: Option<unsafe extern "C" fn(class_name: *const c_char, method_name: *const c_char, method_descriptor: *const c_char, before_cb: HookBeforeFn, after_cb: HookAfterFn) -> i32>,
+    pub log_info: Option<unsafe extern "C" fn(tag: *const c_char, msg: *const c_char)>,
+    pub log_error: Option<unsafe extern "C" fn(tag: *const c_char, msg: *const c_char)>,
     pub get_storage_dir: Option<unsafe extern "C" fn(plugin_name: *const c_char, out_buf: *mut c_char, max_len: u32) -> i32>,
     pub get_cache_dir: Option<unsafe extern "C" fn(plugin_name: *const c_char, out_buf: *mut c_char, max_len: u32) -> i32>,
     pub resolve_asset: Option<unsafe extern "C" fn(plugin_name: *const c_char, asset_name: *const c_char, out_buf: *mut c_char, max_len: u32) -> i32>,
     pub get_current_user_id: Option<unsafe extern "C" fn() -> i64>,
     pub get_active_chat_id: Option<unsafe extern "C" fn() -> i64>,
     pub execute_tdlib_query: Option<unsafe extern "C" fn(json_query: *const c_char, out_buf: *mut c_char, max_len: u32) -> i32>,
+    pub create_composable_lambda: Option<unsafe extern "C" fn(cb: ComposableFn, user_data: usize) -> JObject>,
+    pub create_scoped_lambda: Option<unsafe extern "C" fn(cb: ScopedComposableFn, user_data: usize) -> JObject>,
+    pub replace_composable: Option<unsafe extern "C" fn(param: *mut HookParam, cb: ComposableFn, user_data: usize)>,
+    pub composer_start_group: Option<unsafe extern "C" fn(composer: JObject, key: i32)>,
+    pub composer_end_group: Option<unsafe extern "C" fn(composer: JObject)>,
+    pub composer_get_remembered: Option<unsafe extern "C" fn(composer: JObject) -> JObject>,
+    pub composer_set_remembered: Option<unsafe extern "C" fn(composer: JObject, val: JObject)>,
+    pub composer_is_skipping: Option<unsafe extern "C" fn(composer: JObject) -> bool>,
+    pub register_update_hook: Option<unsafe extern "C" fn(cb: UpdateHookFn, user_data: usize) -> i32>,
+    pub register_message_send_hook: Option<unsafe extern "C" fn(before_cb: MessageBeforeSendFn, after_cb: MessageAfterSendFn, user_data: usize) -> i32>,
+    pub register_message_receive_hook: Option<unsafe extern "C" fn(cb: MessageReceiveFn, user_data: usize) -> i32>,
+    pub register_chat_action: Option<unsafe extern "C" fn(id: *const c_char, label: *const c_char, click_cb: ChatActionClickFn, user_data: usize) -> i32>,
+    pub get_object_field: Option<unsafe extern "C" fn(obj: JObject, field_name: *const c_char) -> JObject>,
+    pub set_object_field: Option<unsafe extern "C" fn(obj: JObject, field_name: *const c_char, val: JObject)>,
+    pub get_int_field: Option<unsafe extern "C" fn(obj: JObject, field_name: *const c_char) -> i32>,
+    pub set_int_field: Option<unsafe extern "C" fn(obj: JObject, field_name: *const c_char, val: i32)>,
+    pub get_long_field: Option<unsafe extern "C" fn(obj: JObject, field_name: *const c_char) -> i64>,
+    pub set_long_field: Option<unsafe extern "C" fn(obj: JObject, field_name: *const c_char, val: i64)>,
+    pub get_bool_field: Option<unsafe extern "C" fn(obj: JObject, field_name: *const c_char) -> bool>,
+    pub set_bool_field: Option<unsafe extern "C" fn(obj: JObject, field_name: *const c_char, val: bool)>,
+    pub get_string_utf: Option<unsafe extern "C" fn(jstr: JObject, out_buf: *mut c_char, max_len: u32) -> i32>,
+    pub create_string_utf: Option<unsafe extern "C" fn(str: *const c_char) -> JObject>,
+    pub get_attached_field: Option<unsafe extern "C" fn(obj: JObject, key: *const c_char) -> JObject>,
+    pub set_attached_field: Option<unsafe extern "C" fn(obj: JObject, key: *const c_char, val: JObject)>,
+    pub get_state_value: Option<unsafe extern "C" fn(state_obj: JObject) -> JObject>,
+    pub set_state_value: Option<unsafe extern "C" fn(state_obj: JObject, val: JObject)>,
+    pub modifier_empty: Option<unsafe extern "C" fn() -> JObject>,
+    pub modifier_size: Option<unsafe extern "C" fn(modifier: JObject, width_dp: f32, height_dp: f32) -> JObject>,
+    pub modifier_width: Option<unsafe extern "C" fn(modifier: JObject, width_dp: f32) -> JObject>,
+    pub modifier_height: Option<unsafe extern "C" fn(modifier: JObject, height_dp: f32) -> JObject>,
+    pub modifier_fill_max_width: Option<unsafe extern "C" fn(modifier: JObject) -> JObject>,
+    pub modifier_fill_max_height: Option<unsafe extern "C" fn(modifier: JObject) -> JObject>,
+    pub modifier_padding: Option<unsafe extern "C" fn(modifier: JObject, start_dp: f32, top_dp: f32, end_dp: f32, bottom_dp: f32) -> JObject>,
+    pub modifier_background: Option<unsafe extern "C" fn(modifier: JObject, argb: u32, corner_radius_dp: f32) -> JObject>,
+    pub modifier_border: Option<unsafe extern "C" fn(modifier: JObject, width_dp: f32, argb: u32, corner_radius_dp: f32) -> JObject>,
+    pub modifier_clickable: Option<unsafe extern "C" fn(modifier: JObject, on_click_lambda: JObject) -> JObject>,
+    pub modifier_weight: Option<unsafe extern "C" fn(scope: JObject, modifier: JObject, weight: f32) -> JObject>,
+    pub compose_row: Option<unsafe extern "C" fn(composer: JObject, modifier: JObject, content_lambda: JObject)>,
+    pub compose_column: Option<unsafe extern "C" fn(composer: JObject, modifier: JObject, content_lambda: JObject)>,
+    pub compose_box: Option<unsafe extern "C" fn(composer: JObject, modifier: JObject, content_lambda: JObject)>,
+    pub compose_spacer: Option<unsafe extern "C" fn(composer: JObject, modifier: JObject)>,
+    pub compose_text: Option<unsafe extern "C" fn(composer: JObject, text: *const c_char, modifier: JObject, argb: u32, font_size_sp: f32, is_bold: bool, max_lines: i32)>,
+    pub compose_image: Option<unsafe extern "C" fn(composer: JObject, bitmap: JObject, modifier: JObject)>,
+    pub get_avatar_bitmap: Option<unsafe extern "C" fn(path: *const c_char) -> JObject>,
 }
-
-static GLOBAL_API: AtomicPtr<PluginApi> = AtomicPtr::new(std::ptr::null_mut());
-
-fn log_info(msg: &str) {
-    let api_ptr = GLOBAL_API.load(Ordering::SeqCst);
-    if api_ptr.is_null() { return; }
-    unsafe {
-        let tag = CString::new(PLUGIN_NAME).unwrap();
-        let message = CString::new(msg).unwrap();
-        ((*api_ptr).log_info)(tag.as_ptr(), message.as_ptr());
-    }
+static METADATA: PluginMetadata = PluginMetadata {
+    name: b"Plain Text Rust\0".as_ptr().cast(),
+    version: b"1.0.0\0".as_ptr().cast(),
+    author: b"MandaGram Community\0".as_ptr().cast(),
+    description: b"Removes the .plain prefix from outgoing text\0".as_ptr().cast(),
+};
+#[no_mangle]
+pub extern "C" fn mandagram_plugin_metadata() -> *const PluginMetadata { &METADATA }
+// The host copies the returned text before releasing the input buffer.
+unsafe extern "C" fn before_send(_: i64, text: *const c_char, _: usize) -> *const c_char {
+    if !text.is_null() && CStr::from_ptr(text).to_bytes().starts_with(b".plain ") {
+        text.add(7)
+    } else { text }
 }
-
-fn log_error(msg: &str) {
-    let api_ptr = GLOBAL_API.load(Ordering::SeqCst);
-    if api_ptr.is_null() { return; }
-    unsafe {
-        let tag = CString::new(PLUGIN_NAME).unwrap();
-        let message = CString::new(msg).unwrap();
-        ((*api_ptr).log_error)(tag.as_ptr(), message.as_ptr());
-    }
-}
-
-unsafe extern "C" fn on_before_message_send(param: *mut HookParam) {
-    if param.is_null() { return; }
-    let _param_ref = &mut *param;
-    log_info("Intercepted outgoing message in TelegramService.sendMessage");
-}
-
-unsafe extern "C" fn on_after_message_send(param: *mut HookParam) {
-    if param.is_null() { return; }
-    log_info("TelegramService.sendMessage successfully dispatched");
-}
-
 #[no_mangle]
 pub unsafe extern "C" fn mandagram_plugin_init(api: *const PluginApi) -> bool {
-    if api.is_null() {
-        return false;
+    let Some(api) = api.as_ref() else { return false; };
+    let Some(register) = api.register_message_send_hook else { return false; };
+    if let Some(log) = api.log_info {
+        log(b"PlainRust\0".as_ptr().cast(), b"Registering text hook\0".as_ptr().cast());
     }
-
-    GLOBAL_API.store(api as *mut PluginApi, Ordering::SeqCst);
-    let api_ref = &*api;
-
-    log_info("Rust plugin loaded");
-
-    if let Some(get_uid) = api_ref.get_current_user_id {
-        let uid = get_uid();
-        log_info(&format!("Current user ID: {}", uid));
-    }
-
-    if let Some(get_cid) = api_ref.get_active_chat_id {
-        let cid = get_cid();
-        log_info(&format!("Active chat ID: {}", cid));
-    }
-
-    if let Some(get_storage) = api_ref.get_storage_dir {
-        let mut buf = [0u8; 512];
-        let tag = CString::new(PLUGIN_NAME).unwrap();
-        let len = get_storage(tag.as_ptr(), buf.as_mut_ptr() as *mut c_char, buf.len() as u32);
-        if len > 0 {
-            if let Ok(path) = CStr::from_ptr(buf.as_ptr() as *const c_char).to_str() {
-                log_info(&format!("Plugin private data directory: {}", path));
-            }
-        }
-    }
-
-    let target_class = CString::new("com/mandagram/network/TelegramService").unwrap();
-    let target_method = CString::new("sendMessage").unwrap();
-
-    let res = (api_ref.register_hook)(
-        target_class.as_ptr(),
-        target_method.as_ptr(),
-        std::ptr::null(),
-        Some(on_before_message_send),
-        Some(on_after_message_send),
-    );
-
-    if res != 0 {
-        log_error("Failed to register hook for TelegramService");
-        return false;
-    }
-
-    true
+    register(Some(before_send), None, 0) == 0
 }

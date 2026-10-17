@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "engine": {
+    "repository": "https://github.com/GrapeS-T/MandaGram",
+    "commit": "259fc5a38b64a12c85121838278f78ee72541dfb"
+  },
+  "target": {
+    "architectures": ["x86_64"],
+    "platforms": ["windows", "linux"],
+    "pluginApiSlots": 53,
+    "versionNegotiation": false,
+    "deinitOrUnregister": false
+  },
+  "hashPolicy": "SHA256 of UTF-8 source bytes with CRLF normalized to LF; header hashes equal the committed engine blobs. ZIP entries use the same LF bytes.",
+  "headers": [
+    {
+      "file": "mandagram_plugin.h",
+      "enginePath": "src/native/include/mandagram_plugin.h",
+      "sha256": "3046fa914fa2766d412c41ce63cbaf63f23ca7bcd6c00aa2b59ca3b3d5176d0e"
+    },
+    {
+      "file": "mandagram_plugin.hpp",
+      "enginePath": "src/native/include/mandagram_plugin.hpp",
+      "sha256": "70e2c166664d87fb0c0dedb42bbe21e53f936186b07d130434fe2ee412ed1ea4"
+    },
+    {
+      "file": "mandagram_plugin.zig",
+      "enginePath": "src/native/include/mandagram_plugin.zig",
+      "sha256": "9ff8206c5b548cab54f4defcc0bf96fb6170b8137d3b4d211686ba38213ff902"
+    }
+  ],
+  "evidence": {
+    "sourceMatched": {
+      "status": "verified",
+      "scope": "The three headers match git show of the pinned engine revision after checkout CRLF normalization. The engine header working tree had no content changes at source audit. This does not certify the rest of the checkout or a released client binary."
+    },
+    "compile": {
+      "status": "not-established-by-this-manifest",
+      "scope": "The separate plugin-examples workflow compiles Windows/Linux x64 examples and checks exported symbols. Only a successful run at a specified landing revision is compilation evidence; packaging does not invoke a compiler."
+    },
+    "runtime": {
+      "status": "not-tested",
+      "scope": "No native library was loaded in MandaGram and no client sessions or data were used. Source or compile evidence is not runtime compatibility evidence."
+    }
+  },
+  "toolchains": {
+    "node": "22",
+    "cpp": "C++17; GCC on Linux, MSVC x64 on Windows",
+    "rust": "1.85.0",
+    "zig": "0.14.1",
+    "ldc": "1.40.0"
+  }
+}

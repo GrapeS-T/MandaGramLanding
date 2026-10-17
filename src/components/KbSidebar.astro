@@ -8,14 +8,6 @@ interface Props {
 
 const { currentSlug = '', isSheet = false } = Astro.props;
 
-// Group categories into two columns as requested:
-// Left: "НАЧАЛО РАБОТЫ", "ФУНКЦИИ КЛИЕНТА", "ПОДДЕРЖКА", "ССЫЛКИ"
-// Right: "РАЗРАБОТКА ПЛАГИНОВ"
-const leftGroupTitles = ["Начало работы", "Функции клиента", "Поддержка"];
-const rightGroupTitles = ["Разработка плагинов"];
-
-const leftCategories = kbCategories.filter(c => leftGroupTitles.includes(c.title));
-const rightCategories = kbCategories.filter(c => rightGroupTitles.includes(c.title));
 
 const linkItems = [
   { title: "ТГК (@MandaGram)", url: "https://t.me/MandaGram" },
@@ -30,62 +22,32 @@ const linkItems = [
     <span>Все разделы</span>
   </a>
 
-  <div class="knav-cols">
-    <!-- Левая колонка: Начало работы, Функции клиента, Поддержка, Ссылки -->
-    <div class="knav-col knav-col-left">
-      {leftCategories.map(cat => (
-        <div class="knav-g">
-          <p class="knav-t">{cat.title}</p>
-          <ul>
-            {cat.articles.map(art => (
-              <li>
-                <a 
-                  href={`/kb/${art.slug}/`} 
-                  class={art.slug === currentSlug ? 'is-current' : ''}
-                  aria-current={art.slug === currentSlug ? 'page' : undefined}
-                >
-                  {art.title}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-
+  <div class="knav-groups">
+    {kbCategories.map(cat => (
       <div class="knav-g">
-        <p class="knav-t">Ссылки</p>
+        <p class="knav-t">{cat.title}</p>
         <ul>
-          {linkItems.map(l => (
+          {cat.articles.map(art => (
             <li>
-              <a href={l.url} target="_blank" rel="noopener">
-                {l.title}
+              <a
+                href={`/kb/${art.slug}/`}
+                class={art.slug === currentSlug ? 'is-current' : ''}
+                aria-current={art.slug === currentSlug ? 'page' : undefined}
+              >
+                {art.title}
               </a>
             </li>
           ))}
         </ul>
       </div>
-    </div>
-
-    <!-- Правая колонка: Разработка плагинов -->
-    <div class="knav-col knav-col-right">
-      {rightCategories.map(cat => (
-        <div class="knav-g">
-          <p class="knav-t">{cat.title}</p>
-          <ul>
-            {cat.articles.map(art => (
-              <li>
-                <a 
-                  href={`/kb/${art.slug}/`} 
-                  class={art.slug === currentSlug ? 'is-current' : ''}
-                  aria-current={art.slug === currentSlug ? 'page' : undefined}
-                >
-                  {art.title}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
+    ))}
+    <div class="knav-g">
+      <p class="knav-t">Ссылки</p>
+      <ul>
+        {linkItems.map(link => (
+          <li><a href={link.url} target="_blank" rel="noopener">{link.title}</a></li>
+        ))}
+      </ul>
     </div>
   </div>
 </nav>

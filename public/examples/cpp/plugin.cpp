@@ -1,30 +1,23 @@
-#include "../../src/native/include/mandagram_plugin.hpp"
-#include <iostream>
+#include "mandagram_plugin.h"
+#include <cstring>
 
-MANDAGRAM_DECLARE_METADATA(
-    "CppSamplePlugin",
-    "1.0.0",
-    "MandaGram Team",
-    "Modern C++ sample plugin for MandaGram"
-)
+static const PluginMetadata metadata = {
+    "Plain Text C++", "1.0.0", "MandaGram Community",
+    "Removes the .plain prefix from outgoing text"
+};
 
-static void on_before_dialog_open(HookParam* param) {
-    mandagram::HookContext ctx(param);
+extern "C" PLUGIN_EXPORT const PluginMetadata* mandagram_plugin_metadata() {
+    return &metadata;
 }
 
-extern "C" PLUGIN_EXPORT bool mandagram_plugin_init(const PluginApi* raw_api) {
-    if (!raw_api) {
-        return false;
-    }
+// No allocation: the host copies the returned substring during this call.
+static const char* before_send(int64_t, const char* text, uintptr_t) noexcept {
+    if (text && std::strncmp(text, ".plain ", 7) == 0) return text + 7;
+    return text;
+}
 
-    mandagram::Plugin plugin(raw_api);
-    plugin.logInfo("CppSamplePlugin", "Plugin loaded successfully");
-
-    int64_t my_uid = plugin.getCurrentUserId();
-    plugin.logInfo("CppSamplePlugin", "Current user ID: " + std::to_string(my_uid));
-
-    int64_t active_chat = plugin.getActiveChatId();
-    plugin.logInfo("CppSamplePlugin", "Active chat ID: " + std::to_string(active_chat));
-
-    return true;
+extern "C" PLUGIN_EXPORT bool mandagram_plugin_init(const PluginApi* api) {
+    if (!api || !api->register_message_send_hook) return false;
+    api->log_info("PlainCpp", "Registering text hook");
+    return api->register_message_send_hook(before_send, nullptr, 0) == 0;
 }

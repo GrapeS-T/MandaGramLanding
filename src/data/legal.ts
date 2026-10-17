@@ -19,7 +19,7 @@ export const legalDocs: Record<string, LegalDoc> = {
       { level: 2, id: "open-source", text: "4. Лицензирование компонентов" }
     ],
     pager: [
-      { href: "/pp.html", title: "Политика конфиденциальности", label: "Конфиденциальность", isNext: true }
+      { href: "/pp/", title: "Политика конфиденциальности", label: "Конфиденциальность", isNext: true }
     ],
     content: `
       <section id="general">
@@ -58,8 +58,8 @@ export const legalDocs: Record<string, LegalDoc> = {
       { level: 2, id: "network-traffic", text: "4. Сетевое взаимодействие" }
     ],
     pager: [
-      { href: "/legal.html", title: "Правовой статус", label: "Правовая информация", isNext: false },
-      { href: "/tos.html", title: "Условия использования", label: "Условия использования", isNext: true }
+      { href: "/legal/", title: "Правовой статус", label: "Правовая информация", isNext: false },
+      { href: "/tos/", title: "Условия использования", label: "Условия использования", isNext: true }
     ],
     content: `
       <section id="data-collection">
@@ -95,7 +95,7 @@ export const legalDocs: Record<string, LegalDoc> = {
       { level: 2, id: "updates", text: "3. Обновления и совместимость" }
     ],
     pager: [
-      { href: "/pp.html", title: "Политика конфиденциальности", label: "Конфиденциальность", isNext: false }
+      { href: "/pp/", title: "Политика конфиденциальности", label: "Конфиденциальность", isNext: false }
     ],
     content: `
       <section id="acceptance">

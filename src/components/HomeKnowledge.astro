@@ -1,0 +1,185 @@
+---
+import { kbArticles, kbPopularQuickLinks } from '../data/kb';
+
+interface Props {
+  lang: 'ru' | 'en';
+}
+
+const { lang } = Astro.props;
+const englishArticles: Record<string, [string, string]> = {
+  intro: ['Introduction to MandaGram', 'what is mandagram architecture overview concept'],
+  installation: ['Installation on Windows & Linux', 'install windows linux portable exe appimage download'],
+  hotkeys: ['Hotkeys and Keyboard Shortcuts', 'hotkeys shortcuts ctrl formatting keybinds'],
+  quickstart: ['Quick Start: First Plugin', 'quick start create plugin c abi init dll so'],
+  'plugin-recipes': ['Practical Plugin Recipes', 'plugin recipes examples scenarios hooks'],
+  api: ['C API & Method Interception', 'c api hookparam hook before after method calls'],
+  'api-reference': ['C API Reference', 'c abi functions reference handles hookparam'],
+  examples: ['Examples in C++, Rust, Zig & D', 'code examples cpp rust zig d betterc source'],
+  hotreload: ['Hot-Reload Without Restarts', 'hot reload hot reloading runtime cache update'],
+  storage: ['Storage, Settings & Watchdog', 'watchdog crash recovery safe mode data cache settings'],
+  architecture: ['Core Architecture & Compose', 'architecture ffm classfile compose handles api'],
+  themes: ['Material 3 Expressive & Monet Themes', 'themes monet evening red pistachio lavender google sans'],
+  privacy: ['Privacy, Preview & App Lock', 'preview read receipts pin applock panic data'],
+  media: ['Built-in VLC Media Player', 'player vlc video audio playback software decoding'],
+  proxy: ['Proxies & Connection Diagnostics', 'proxy mtproto socks5 ping web disabled import'],
+  troubleshooting: ['Troubleshooting & Safe Mode', 'errors issues crashes safe mode plugin failed'],
+  community: ['Community & Contacts', 'community chat telegram github support']
+};
+const copy = lang === 'en' ? {
+  title: 'Documentation & Guides',
+  intro: 'Build C ABI plugins in C++, Rust, Zig or D. Explore the API and client guides, available in Russian.',
+  placeholder: 'Search documentation',
+  empty: 'No results found — try a shorter query',
+  popular: 'Popular articles',
+  search: 'Search',
+  open: 'Open All Guides'
+} : {
+  title: 'База знаний и разработка',
+  intro: 'Создавайте C ABI плагины на C++, Rust, Zig и D. Изучайте API и возможности клиента.',
+  placeholder: 'Поиск по документации',
+  empty: 'Ничего не нашлось — попробуйте короче',
+  popular: 'Популярные статьи',
+  search: 'Открыть',
+  open: 'Открыть всю базу знаний'
+};
+const popular = kbPopularQuickLinks.map(([slug, title]) => [
+  slug, lang === 'en' ? englishArticles[slug][0] : title
+]);
+const searchList = Object.values(kbArticles).map(article => [
+  article.slug,
+  lang === 'en' ? englishArticles[article.slug][0] : article.title,
+  [article.title, article.headings.map(heading => heading.text).join(' '),
+    lang === 'en' ? englishArticles[article.slug][1] : ''].join(' ')
+]);
+---
+<section aria-labelledby="kb-title" class="sec wrap home-knowledge" id="knowledge">
+  <div class="kb">
+    <div class="kb-head reveal">
+      <h2 class="h2-xl" id="kb-title">{copy.title}</h2>
+      <p class="kb-sub">{copy.intro}</p>
+    </div>
+    <div class="kb-box reveal" data-empty={copy.empty} data-kb="" data-list={JSON.stringify(searchList)} data-popular={JSON.stringify(popular)}>
+      <form action="/kb/" class="search" method="get" role="search">
+        <label class="sfield">
+          <svg aria-hidden="true" class="ic" fill="currentColor" focusable="false" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18.031 16.6168L22.3137 20.8995L20.8995 22.3137L16.6168 18.031C15.0769 19.263 13.124 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2C15.968 2 20 6.032 20 11C20 13.124 19.263 15.0769 18.031 16.6168ZM16.0247 15.8748C17.2475 14.6146 18 12.8956 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18C12.8956 18 14.6146 17.2475 15.8748 16.0247L16.0247 15.8748Z"/>
+          </svg>
+          <span class="sr-only">{copy.placeholder}</span>
+          <input autocomplete="off" data-kb-input="" enterkeyhint="search" name="q" placeholder={copy.placeholder} type="search" />
+        </label>
+        <button class="btn btn--primary btn--sm-ic st" type="submit">
+          <svg aria-hidden="true" class="ic" fill="currentColor" focusable="false" height="18" viewBox="0 0 24 24" width="18" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/>
+          </svg>
+          <span>{copy.search}</span>
+        </button>
+      </form>
+      <div aria-label={copy.popular} aria-live="polite" class="chips kb-links" data-kb-links="">
+        {popular.map(([slug, title], idx) => (
+          <a class="chip chip--link st" href={`/kb/${slug}/`} style={`--i:${idx}`}>
+            <svg aria-hidden="true" class="ic" fill="currentColor" focusable="false" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 6V8H5V19H16V14H18V20C18 20.5523 17.5523 21 17 21H4C3.44772 21 3 20.5523 3 20V7C3 6.44772 3.44772 6 4 6H10ZM21 3V11H19L18.9999 6.413L11.2071 14.2071L9.79289 12.7929L17.5849 5H13V3H21Z"/>
+            </svg>
+            {title}
+          </a>
+        ))}
+      </div>
+      <a class="btn btn--primary btn--sm-ic st kb-mobile-open" href="/kb/">
+        <svg aria-hidden="true" class="ic" fill="currentColor" focusable="false" height="18" viewBox="0 0 24 24" width="18" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/>
+        </svg>
+        <span>{copy.open}</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  @media (max-width:759px) {
+    .kb {
+      align-items:stretch;
+      gap:20px;
+      padding:20px 14px 14px;
+      border:1px solid var(--outline);
+      border-radius:24px;
+      background:var(--surface);
+      text-align:left;
+    }
+    .kb-head {
+      align-items:flex-start;
+      gap:10px;
+    }
+    .kb-head .h2-xl {
+      font-size:clamp(26px, 6.5vw, 36px);
+      line-height:1.12;
+      letter-spacing:-.025em;
+    }
+    .kb-sub {
+      font-size:14px;
+      line-height:1.55;
+      color:var(--text-2);
+    }
+    .kb-box { gap:12px; }
+    .search .btn { display:none; }
+    .sfield {
+      height:48px;
+      gap:8px;
+      padding:0 12px;
+      border-radius:14px;
+      background:var(--surface-hi);
+    }
+    .sfield input { width:100%; font-size:16px; }
+    .sfield input::placeholder { font-size:14px; }
+    .kb-links {
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      grid-auto-rows:1fr;
+      gap:8px;
+      align-items:stretch;
+    }
+    /* Search results are inserted by Base and do not carry Astro scope attributes. */
+    .kb-links :global(.chip) {
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      gap:8px;
+      width:100%;
+      min-width:0;
+      min-height:60px;
+      height:auto;
+      padding:12px 10px;
+      border-radius:14px;
+      background:var(--surface-hi);
+      white-space:normal;
+      overflow-wrap:anywhere;
+      text-align:left;
+      font-size:13px;
+      line-height:1.35;
+    }
+    .kb-links :global(.chip .ic) {
+      width:16px;
+      height:16px;
+      flex-shrink:0;
+      color:var(--primary);
+    }
+    .kb-links :global(.chip:last-child:nth-child(odd)) {
+      grid-column:1 / -1;
+      min-height:48px;
+    }
+    .kb-links :global(.kb-empty) {
+      grid-column:1 / -1;
+      padding:12px 4px;
+      line-height:1.5;
+    }
+    .kb-mobile-open {
+      display:inline-flex;
+      width:100%;
+      height:48px;
+      min-height:48px;
+      padding:0 12px;
+      border-radius:14px;
+      font-size:14px;
+      gap:8px;
+    }
+  }
+</style>
